@@ -66,7 +66,7 @@ public class Dot {
 
 	public void mutate() {
 		for (int i = 0; i < brain.direction.length; i++) {
-			if (Math.random() <= 0.01) {
+			if (Math.random() <= 0.02) {
 				brain.direction[i] = Brain.getNewPosition();
 			}
 		}
@@ -74,8 +74,7 @@ public class Dot {
 
 	public void calculateFitness() {
 		if (reachedGoal) {
-			weight = 3
-					+ (double) (brain.step * brain.step) / (brain.direction.length * brain.direction.length);
+			weight = 2 + (double) (2*brain.direction.length * brain.direction.length)/(brain.step * brain.step) ;
 		} else
 			weight = 1 / (double) (currPos.distanceTo(goal) * currPos.distanceTo(goal));
 		//System.out.println(weight);
@@ -101,5 +100,15 @@ public class Dot {
 
 		//TODO implement
 		return new Dot(startX, startY, maxX, maxY, goal, new Brain(newDirections)); //TODO not hardcode
+	}
+
+
+	public void restart(){
+		currPos = new Position(startX,startY);
+		velocity = 1;
+		acceleration = 1;
+		brain.step=0;
+		isAlive = true;
+		reachedGoal = false;
 	}
 }
