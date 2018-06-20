@@ -6,18 +6,16 @@ public class Dot {
 	private int acceleration;
 	private int maxX;
 	private int maxY;
-	private int startX;
-	private int startY;
 	private boolean isAlive = true;
 	private boolean reachedGoal = false;
 	private double weight = 0;
+	private Position start;
 	private Position goal;
 
-	public Dot(int startX, int startY, int maxX, int maxY, Position goal) {
-		this.startX = startX;
-		this.startY = startY;
-		brain = new Brain(500);
-		currPos = new Position(startX, startY);
+	public Dot(Position start, int maxX, int maxY, Position goal) {
+		this.start = start;
+		brain = new Brain(1000); // TODO parameterise
+		currPos = new Position(start.x,start.y);
 		this.goal = goal;
 		velocity = 1;
 		acceleration = 1; // TODO increase??
@@ -25,8 +23,8 @@ public class Dot {
 		this.maxX = maxX;
 	}
 
-	public Dot(int startX, int startY, int maxX, int maxY, Position goal, Brain newBrain) {
-		this(startX, startY, maxX, maxY, goal);
+	public Dot(Position start, int maxX, int maxY, Position goal, Brain newBrain) {
+		this(start, maxX, maxY, goal);
 		brain = newBrain;
 	}
 
@@ -49,6 +47,9 @@ public class Dot {
 			if (currPos.x > maxX - 10 || currPos.y > maxY - 10 || currPos.x < 3 || currPos.y < 3) {
 				isAlive = false;
 			}
+			System.out.println((maxX/2-150)+ " "+ (maxY/2-150));
+			if(currPos.x>= maxX/2-150 && currPos.x<=maxX/2+150 && currPos.y>=maxY/2-150 && currPos.y<=maxY/2+150) //todo remove later
+				isAlive = false;
 		}
 	}
 
@@ -65,8 +66,9 @@ public class Dot {
 	}
 
 	public void mutate() {
+		double mutationprob = 0.01;
 		for (int i = 0; i < brain.direction.length; i++) {
-			if (Math.random() <= 0.02) {
+			if (Math.random() <= mutationprob) {
 				brain.direction[i] = Brain.getNewPosition();
 			}
 		}
@@ -97,14 +99,12 @@ public class Dot {
 					newDirections[i + j] = b.brain.direction[i + j];
 		}
 
-
-		//TODO implement
-		return new Dot(startX, startY, maxX, maxY, goal, new Brain(newDirections)); //TODO not hardcode
+		return new Dot(start, maxX, maxY, goal, new Brain(newDirections));
 	}
 
 
 	public void restart(){
-		currPos = new Position(startX,startY);
+		currPos = new Position(start.x,start.y);
 		velocity = 1;
 		acceleration = 1;
 		brain.step=0;

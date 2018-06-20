@@ -1,22 +1,27 @@
 import javax.swing.*;
+import java.awt.*;
 
 public class Population {
-	private int width = 800; // TODO fix this
+	private int width = 1200; // TODO fix this
 	private int height = 600;
 	private Position goal;
 	private Dot[] currGeneration;
 	private JPanel drawingPanel;
 	private double totalFitness = 0;
 	private int genNo = 1;
-	private int maxSteps = 400;
+	private int maxSteps = 1000;
 
 
 	public Population(JPanel drawingPanel) {
 		this.drawingPanel = drawingPanel;
-		goal = new Position(width / 3, 40);
-		currGeneration = new Dot[400];
+		drawingPanel.setPreferredSize(new Dimension(width,height));
+		Position start = new Position(20,height/2);
+		goal = new Position(width -50, height/2);
+
+
+		currGeneration = new Dot[maxSteps];
 		for (int i = 0; i < currGeneration.length; i++) {
-			currGeneration[i] = new Dot(width / 2, height - 20, width, height, goal);
+			currGeneration[i] = new Dot(start, width, height, goal);
 		}
 	}
 
@@ -47,6 +52,7 @@ public class Population {
 		Dot bestDot = currGeneration[index];
 		currGeneration[index] = currGeneration[0];
 		currGeneration[0] = bestDot;
+		if(bestDot.isReachedGoal())
 		maxSteps = bestDot.getBrain().step;  // TODO check if it has reached the goal ???
 	}
 
@@ -68,6 +74,7 @@ public class Population {
 		}
 		currGeneration = nextGen;
 		currGeneration[0] = bestDot;
+		genNo++;
 	}
 
 	private Dot getParent() {
@@ -89,25 +96,26 @@ public class Population {
 		return goal;
 	}
 
-	public void go() {
-		int generations = 1000;
-		for (int i = 0; i < generations; i++) { // TODO increase later
-			if (i % 10 == 0)
-				run(1); //TODO increase later later
-			else
-				run(1);
-		}
-	}
+//	public void go() {
+//		int generations = 1000;
+//		for (int i = 0; i < generations; i++) { // TODO increase later
+//			if (i % 100 == 0)
+//				run(100); //TODO increase later later
+//			else
+//				run(1);
+//		}
+//	}
 
 
-	private void run(int sleep) {
+	public void run(int sleep) {
 		for (int i = 0; i < maxSteps; i++) {
 			updateAll();
 
 			try {
 				Thread.sleep(sleep);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				Thread.currentThread().interrupt();
+				//e.printStackTrace();
 			}
 		}
 
@@ -127,7 +135,12 @@ public class Population {
 
 		mutate();
 		crossover();
-		genNo++;
 	}
 
+	public Dot getFittest(){
+		return currGeneration[0];
+	}
+	public int getGenNumber() {
+		return genNo;
+	}
 }
