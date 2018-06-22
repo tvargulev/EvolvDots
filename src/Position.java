@@ -7,7 +7,7 @@ public class Position {
 		this.y=y;
 	}
 
-	public int distanceTo(Position a){
-		return Math.abs(a.x-x)+Math.abs(a.y-y);
+	public double distanceTo(Position a){
+		return Math.sqrt((x-a.x)*(x-a.x)+(y-a.y)*(y-a.y));
 	}
 }

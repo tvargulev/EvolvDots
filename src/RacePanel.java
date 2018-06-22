@@ -1,16 +1,55 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 
 public class RacePanel extends JPanel {
 	private Population myPopulation;
 	private Position goal;
+	private ArrayList<Rectangle> blocks;
 
 	public RacePanel(){
 		this.myPopulation = new Population(this);
 		goal = myPopulation.getGoal();
-		//this.setPreferredSize(new Dimension(800,600));
+		blocks = new ArrayList<>();
 		this.setBackground(Color.white);
+		this.addMouseListener(new MouseListener() {
+			private int startX;
+			private int startY;
+			@Override
+			public void mouseClicked(MouseEvent e) {
 
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				startX=e.getX(); //TODO only when stopped
+				startY=e.getY();
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				int endX = e.getX();
+				int endY = e.getY();
+
+				Rectangle r = new Rectangle(new Rectangle(Math.min(startX,endX),Math.min(startY,endY),Math.abs(startX-endX),Math.abs(startY-endY)));
+				blocks.add(r);
+				myPopulation.addBlock(r);
+				repaint();
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+
+			}
+		});
 	}
 
 	@Override
@@ -21,14 +60,19 @@ public class RacePanel extends JPanel {
 		//paints the boundaries
 		g2d.drawRect(0,0,getPreferredSize().width,getPreferredSize().height);
 
+		//paints obstacles
+		g2d.setColor(Color.lightGray);
+		for(Rectangle r : blocks){
+			g2d.fill(r);
+		}
+
+
 		g2d.setColor(Color.gray);
 		if(myPopulation.getFittest().isReachedGoal()){
 			g2d.drawString("Generation "+myPopulation.getGenNumber()+
-					"in "+myPopulation.getFittest().getBrain().step+"steps",10,20);
+					" reached the goal in "+myPopulation.getFittest().getBrain().step+" steps",10,20);
 		}
 		g2d.drawString("Generation "+myPopulation.getGenNumber(),10,20);
-
-		g2d.fillRect(getPreferredSize().width/2-150,getPreferredSize().height/2-150,300,300); // TODO remove later
 
 
 		// paints the goal
@@ -50,10 +94,6 @@ public class RacePanel extends JPanel {
 		}
 	}
 
-	public void go(int a){
-		myPopulation.run(a);
-		//myPopulation.go();
-	}
 
 	public Population getPopulation() {
 		return myPopulation;

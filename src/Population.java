@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class Population {
 	private int width = 1200; // TODO fix this
@@ -10,16 +11,19 @@ public class Population {
 	private double totalFitness = 0;
 	private int genNo = 1;
 	private int maxSteps = 1000;
+	private int dotsCount = 1000;
+	private ArrayList<Shape> blocks;
 
 
 	public Population(JPanel drawingPanel) {
 		this.drawingPanel = drawingPanel;
 		drawingPanel.setPreferredSize(new Dimension(width,height));
-		Position start = new Position(20,height/2);
-		goal = new Position(width -50, height/2);
+		Position start = new Position(20,height/2); // TODO make changeable
+		goal = new Position(width -50, height/2); // TODO make changeable
 
+		blocks = new ArrayList<>();
 
-		currGeneration = new Dot[maxSteps];
+		currGeneration = new Dot[dotsCount];
 		for (int i = 0; i < currGeneration.length; i++) {
 			currGeneration[i] = new Dot(start, width, height, goal);
 		}
@@ -27,7 +31,7 @@ public class Population {
 
 	public void updateAll() {
 		for (Dot p : currGeneration)
-			p.update();
+			p.update(blocks);
 		drawingPanel.repaint();
 	}
 
@@ -79,10 +83,10 @@ public class Population {
 
 	private Dot getParent() {
 		double rnd = Math.random() * totalFitness;
-		double curFitnes = 0;
+		double currFitness = 0;
 		for (int i = 0; i < currGeneration.length; i++) {
-			curFitnes += currGeneration[i].getWeight(); //TODO fix doenst work
-			if (rnd <= curFitnes)
+			currFitness += currGeneration[i].getWeight();
+			if (rnd <= currFitness)
 				return currGeneration[i];
 		}
 		return null;
@@ -96,16 +100,10 @@ public class Population {
 		return goal;
 	}
 
-//	public void go() {
-//		int generations = 1000;
-//		for (int i = 0; i < generations; i++) { // TODO increase later
-//			if (i % 100 == 0)
-//				run(100); //TODO increase later later
-//			else
-//				run(1);
-//		}
-//	}
-
+	public void addBlock(Shape s){
+		blocks.add(s);
+		maxSteps = 1000; // resets
+	}
 
 	public void run(int sleep) {
 		for (int i = 0; i < maxSteps; i++) {
@@ -119,7 +117,7 @@ public class Population {
 			}
 		}
 
-		calculateFitness(); //TODO No mutation on last generation;
+		calculateFitness();
 		saveFittestDot();
 		int reached = 0;
 		for(Dot d : currGeneration){

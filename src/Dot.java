@@ -1,3 +1,6 @@
+import java.awt.*;
+import java.util.List;
+
 public class Dot {
 	private Position currPos;
 	private Brain brain;
@@ -39,7 +42,7 @@ public class Dot {
 		//System.out.println("New d x="+ currPos.x+" : y="+currPos.y+" ");
 	}
 
-	public void update() {
+	public void update(List<Shape> blocks) {
 		if (isAlive && !reachedGoal) {
 			move();
 			if (currPos.distanceTo(goal) < 5)
@@ -47,9 +50,11 @@ public class Dot {
 			if (currPos.x > maxX - 10 || currPos.y > maxY - 10 || currPos.x < 3 || currPos.y < 3) {
 				isAlive = false;
 			}
-			System.out.println((maxX/2-150)+ " "+ (maxY/2-150));
-			if(currPos.x>= maxX/2-150 && currPos.x<=maxX/2+150 && currPos.y>=maxY/2-150 && currPos.y<=maxY/2+150) //todo remove later
-				isAlive = false;
+			for(Shape s : blocks){
+				if(s.contains(currPos.x,currPos.y))
+					isAlive = false;
+			}
+			//System.out.println((maxX/2-150)+ " "+ (maxY/2-150));
 		}
 	}
 
@@ -76,7 +81,7 @@ public class Dot {
 
 	public void calculateFitness() {
 		if (reachedGoal) {
-			weight = 2 + (double) (2*brain.direction.length * brain.direction.length)/(brain.step * brain.step) ;
+			weight = 0.5 + (double) (brain.direction.length * brain.direction.length)/(brain.step * brain.step) ;
 		} else
 			weight = 1 / (double) (currPos.distanceTo(goal) * currPos.distanceTo(goal));
 		//System.out.println(weight);

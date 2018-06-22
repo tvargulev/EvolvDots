@@ -1,6 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.concurrent.Flow;
+
 
 public class DotFrame extends JFrame {
 	private JPanel contentPane;
@@ -9,8 +9,8 @@ public class DotFrame extends JFrame {
 	private boolean run;
 	SimulationThread sm;
 
-
-	public DotFrame(){
+	public DotFrame(String title){
+		super(title);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		contentPane = new JPanel();
@@ -32,15 +32,19 @@ public class DotFrame extends JFrame {
 
 		JButton start = new JButton("Start");
 		start.addActionListener(e -> {
-			sm=new SimulationThread(rp.getPopulation(),(int)sleep.getValue());
-			sm.start();
+
+			if(sm==null ||!sm.isAlive()){
+				sm=new SimulationThread(rp.getPopulation(),(int)sleep.getValue());
+				sm.start();
+			}
+
 		});
 		buttonPanel.add(start);
 
 
 		JButton stop = new JButton("Stop");
 		stop.addActionListener(e -> {
-			if(sm!=null || !sm.isInterrupted())
+			if(sm!=null && !sm.isInterrupted())
 				sm.interrupt();
 		});
 		buttonPanel.add(stop);

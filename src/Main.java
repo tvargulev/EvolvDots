@@ -1,16 +1,7 @@
-import javax.swing.*;
 
 public class Main {
 	public static void main(String[] args) {
-//		JFrame mainFrame = new JFrame("Genetic Algorithm test");
-//		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		RacePanel rp = new RacePanel();
-//		mainFrame.setContentPane(rp);
-//		mainFrame.pack();
-		DotFrame mainFrame = new DotFrame();
+		DotFrame mainFrame = new DotFrame("EvolvDots");
 		mainFrame.setVisible(true);
-		//rp.go(10);
-		 //mainFrame.go();
-
 	}
 }
