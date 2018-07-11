@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 public class RacePanel extends JPanel {
 	private Population myPopulation;
 	private Position goal;
+	private Shape temp;
 	private ArrayList<Rectangle> blocks;
 
 	public RacePanel(){
@@ -15,7 +17,11 @@ public class RacePanel extends JPanel {
 		goal = myPopulation.getGoal();
 		blocks = new ArrayList<>();
 		this.setBackground(Color.white);
-		this.addMouseListener(new MouseListener() {
+		ObstacleListener myObstacleListener = new ObstacleListener();
+		this.addMouseListener(myObstacleListener);
+		this.addMouseMotionListener(myObstacleListener);
+	/*
+	this.addMouseListener(new MouseListener() {
 			private int startX;
 			private int startY;
 			@Override
@@ -50,6 +56,43 @@ public class RacePanel extends JPanel {
 
 			}
 		});
+		*/
+
+	}
+
+	private class ObstacleListener extends MouseAdapter{
+		private int startX;
+		private int startY;
+		@Override
+		public void mousePressed(MouseEvent e) {
+			super.mousePressed(e);
+			startX=e.getX();
+			startY=e.getY();
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			super.mouseDragged(e);
+			int endX = e.getX();
+			int endY = e.getY();
+
+			temp = new Rectangle(new Rectangle(Math.min(startX,endX),Math.min(startY,endY),Math.abs(startX-endX),Math.abs(startY-endY)));
+			repaint();
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			super.mouseReleased(e);
+			temp = null;
+
+			int endX = e.getX();
+			int endY = e.getY();
+
+			Rectangle r = new Rectangle(new Rectangle(Math.min(startX,endX),Math.min(startY,endY),Math.abs(startX-endX),Math.abs(startY-endY)));
+			blocks.add(r);
+			myPopulation.addBlock(r);
+			repaint();
+		}
 	}
 
 	@Override
@@ -59,6 +102,10 @@ public class RacePanel extends JPanel {
 		Dot[] population = myPopulation.getCurrGeneration();
 		//paints the boundaries
 		g2d.drawRect(0,0,getPreferredSize().width,getPreferredSize().height);
+
+		g2d.setColor(Color.darkGray);
+		if(temp!=null)
+			g2d.draw(temp);
 
 		//paints obstacles
 		g2d.setColor(Color.lightGray);
@@ -94,7 +141,10 @@ public class RacePanel extends JPanel {
 		}
 	}
 
-
+	public void clearBlocks(){
+		blocks.clear();
+		myPopulation.clearBlocks();
+	}
 	public Population getPopulation() {
 		return myPopulation;
 	}

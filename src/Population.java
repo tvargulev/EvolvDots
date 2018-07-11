@@ -13,6 +13,7 @@ public class Population {
 	private int maxSteps = 1000;
 	private int dotsCount = 1000;
 	private ArrayList<Shape> blocks;
+	private int sleep = 10; // ms pause between steps
 
 
 	public Population(JPanel drawingPanel) {
@@ -29,13 +30,16 @@ public class Population {
 		}
 	}
 
-	public void updateAll() {
+	private void updateAll() {
 		for (Dot p : currGeneration)
 			p.update(blocks);
 		drawingPanel.repaint();
 	}
 
-	public void calculateFitness() {
+	/**
+	 * claculates the fitness of each dot
+	 */
+	private void calculateFitness() {
 		totalFitness = 0;
 		for (Dot p : currGeneration) {
 			p.calculateFitness();
@@ -43,8 +47,10 @@ public class Population {
 		}
 	}
 
-	// stores  the fittest dotes in the first position
-	public void saveFittestDot() {
+	/**
+	 * stores  the fittest dotes in the first position
+	 */
+	private void saveFittestDot() {
 		int index = 0;
 		double maxFitness = currGeneration[index].getWeight();
 		for (int i = 1; i < currGeneration.length; i++) {
@@ -60,13 +66,19 @@ public class Population {
 		maxSteps = bestDot.getBrain().step;  // TODO check if it has reached the goal ???
 	}
 
-	public void mutate() {
+	/**
+	 * mutates all dots excepts the first one
+	 */
+	private void mutate() {
 		for (int i = 1; i < currGeneration.length; i++) { // doesn't mutate the first one
 			currGeneration[i].mutate();
 		}
 	}
 
-	public void crossover() {
+	/**
+	 *  creates the next generation while preserving the fittest dot in the current one
+	 */
+	private void crossover() {
 		Dot[] nextGen = new Dot[currGeneration.length];
 		Dot bestDot = currGeneration[0];
 		bestDot.restart();
@@ -81,6 +93,14 @@ public class Population {
 		genNo++;
 	}
 
+	public void clearBlocks(){
+		blocks.clear();
+	}
+
+	/**
+	 *  returns a parent dot with probability based on fitness level
+	 * @return parent dot
+	 */
 	private Dot getParent() {
 		double rnd = Math.random() * totalFitness;
 		double currFitness = 0;
@@ -89,7 +109,7 @@ public class Population {
 			if (rnd <= currFitness)
 				return currGeneration[i];
 		}
-		return null;
+		return null; // should never reach this
 	}
 
 	public Dot[] getCurrGeneration() {
@@ -105,7 +125,7 @@ public class Population {
 		maxSteps = 1000; // resets
 	}
 
-	public void run(int sleep) {
+	public void run() {
 		for (int i = 0; i < maxSteps; i++) {
 			updateAll();
 
@@ -125,9 +145,9 @@ public class Population {
 				reached++;
 		}
 
-		System.out.println("Generation No:" + genNo + "Dots reached goal: "+reached
-				+"  maxWeight:"+ currGeneration[0].getWeight()
-				+ " in number of steps:" + currGeneration[0].getBrain().step);
+		System.out.println("Generation No:" + genNo + " Dots reached goal: "+reached
+				+" maxWeight: "+ currGeneration[0].getWeight()
+				+ " in number of steps: " + currGeneration[0].getBrain().step);
 
 
 
@@ -135,9 +155,17 @@ public class Population {
 		crossover();
 	}
 
+
+	public void setSleep(int sleep){
+		this.sleep=sleep;
+	}
+	/**
+	 * @return fittest dot in the generation which is stored in the first position
+	 */
 	public Dot getFittest(){
 		return currGeneration[0];
 	}
+
 	public int getGenNumber() {
 		return genNo;
 	}

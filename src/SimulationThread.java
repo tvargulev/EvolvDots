@@ -1,17 +1,15 @@
 public class SimulationThread extends Thread{
 	private Population myPopulation;
-	private int sleep;
 
 
-	public SimulationThread(Population myPopulation,int sleep){
+	public SimulationThread(Population myPopulation){
 		this.myPopulation=myPopulation;
-		this.sleep = sleep;
 	}
 
 	@Override
 	public void run() {
 		while(true){
-			myPopulation.run(sleep);
+			myPopulation.run();
 			if(interrupted())
 				return;
 		}
